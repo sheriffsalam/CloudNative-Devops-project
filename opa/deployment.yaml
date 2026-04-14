@@ -1,0 +1,90 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: opa
+  labels:
+    app: opa
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: opa
+  template:
+    metadata:
+      labels:
+        app: opa
+    spec:
+      containers:
+      - name: opa
+        image: openpolicyagent/opa:latest
+        ports:
+        - containerPort: 8181
+        args:
+        - "run"
+        - "--server"
+        - "--addr=0.0.0.0:8181"
+        - "/policies/policy.rego"
+        volumeMounts:
+        - name: policy
+          mountPath: /policies
+      volumes:
+      - name: policy
+        configMap:
+          name: opa-policy
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: opa
+spec:
+  selector:
+    app: opa
+  ports:
+  - protocol: TCP
+    port: 8181
+    targetPort: 8181
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: opa-policy
+data:
+  policy.rego: |
+    package httpapi.authz
+
+    import input as http_api
+
+    default allow = false
+
+    allow {
+        http_api.method == "GET"
+        http_api.path == "/healthz"
+    }
+
+    allow {
+        http_api.method == "POST"
+        http_api.path == "/order"
+        http_api.headers["dapr-app-id"] == "service-1"
+    }
+
+    allow {
+        http_api.method == "POST"
+        http_api.path == "/orders-handler"
+        http_api.headers["dapr-app-id"] == "service-2"
+    }
+
+    # Restrict service-1 from calling service-2 directly during certain time
+    # Assume time is in UTC, restrict between 10:00 and 11:00
+    allow {
+        http_api.method == "POST"
+        http_api.path == "/validate"
+        http_api.headers["dapr-app-id"] == "service-1"
+        not is_restricted_time
+    }
+
+    is_restricted_time {
+        now := time.now_ns()
+        hour := time.date(now).hour
+        hour >= 10
+        hour < 11
+    }

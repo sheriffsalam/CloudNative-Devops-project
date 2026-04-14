@@ -1,0 +1,9 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: daprconfig
+spec:
+  httpPipeline:
+    handlers:
+    - name: opa-policy  # This must match the name in opa-middleware.yaml
+      type: middleware.http.opa

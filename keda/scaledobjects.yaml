@@ -1,0 +1,33 @@
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: service-1-scaler
+spec:
+  scaleTargetRef:
+    name: service-1
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.default.svc.cluster.local:9090
+      metricName: http_requests_total
+      threshold: '100'
+      query: sum(rate(http_requests_total{job="service-1"}[5m]))
+---
+apiVersion: keda.sh/v1alpha1
+kind: ScaledObject
+metadata:
+  name: service-2-scaler
+spec:
+  scaleTargetRef:
+    name: service-2
+  minReplicaCount: 1
+  maxReplicaCount: 10
+  triggers:
+  - type: prometheus
+    metadata:
+      serverAddress: http://prometheus.default.svc.cluster.local:9090
+      metricName: http_requests_total
+      threshold: '100'
+      query: sum(rate(http_requests_total{job="service-2"}[5m]))

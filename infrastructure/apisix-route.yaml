@@ -1,0 +1,13 @@
+apiVersion: apisix.apache.org/v2
+kind: ApisixRoute
+metadata:
+  name: service-1-route
+spec:
+  http:
+  - name: order-rule
+    match:
+      paths:
+      - /order
+    backends:
+    - serviceName: service-1
+      servicePort: 80

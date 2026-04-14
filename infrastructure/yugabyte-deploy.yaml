@@ -1,0 +1,74 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: yb-prod-yugabyte-tserver
+spec:
+  selector:
+    app: yb-tserver
+  ports:
+  - name: yql-port
+    port: 9042
+    targetPort: 9042
+  - name: ycql-port
+    port: 5433
+    targetPort: 5433
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: yb-prod-yugabyte
+spec:
+  serviceName: yb-prod-yugabyte
+  replicas: 1
+  selector:
+    matchLabels:
+      app: yb-tserver
+  template:
+    metadata:
+      labels:
+        app: yb-tserver
+    spec:
+      containers:
+      - name: yb-tserver
+        image: yugabytedb/yugabyte:latest
+        ports:
+        - containerPort: 5433
+        - containerPort: 9042
+        env:
+        - name: YB_MASTER_ADDRESSES
+          value: "yb-prod-yugabyte-master-0.yb-prod-yugabyte.default.svc.cluster.local:7100"
+        command:
+        - "/home/yugabyte/bin/yb-tserver"
+        - "--tserver_master_addrs=yb-prod-yugabyte-master-0.yb-prod-yugabyte.default.svc.cluster.local:7100"
+        - "--rpc_bind_addresses=0.0.0.0"
+        - "--enable_ysql=true"
+        - "--ysql_num_shards_per_tserver=1"
+        volumeMounts:
+        - name: yb-data
+          mountPath: /mnt/disk0
+      - name: yb-master
+        image: yugabytedb/yugabyte:latest
+        ports:
+        - containerPort: 7100
+        env:
+        - name: YB_MASTER_ADDRESSES
+          value: "yb-prod-yugabyte-master-0.yb-prod-yugabyte.default.svc.cluster.local:7100"
+        command:
+        - "/home/yugabyte/bin/yb-master"
+        - "--master_addresses=yb-prod-yugabyte-master-0.yb-prod-yugabyte.default.svc.cluster.local:7100"
+        - "--rpc_bind_addresses=0.0.0.0"
+        volumeMounts:
+        - name: yb-data
+          mountPath: /mnt/disk0
+      volumes:
+      - name: yb-data
+        emptyDir: {}
+  volumeClaimTemplates:
+  - metadata:
+    name: yb-data
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 10Gi

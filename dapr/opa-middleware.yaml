@@ -1,0 +1,12 @@
+apiVersion: dapr.io/v1alpha1
+kind: Component
+metadata:
+  name: opa-policy
+spec:
+  type: middleware.http.opa
+  version: v1
+  metadata:
+  - name: opaServer
+    value: "http://opa.default.svc.cluster.local:8181/v1/data/httpapi/authz"
+  - name: allow
+    value: "true"

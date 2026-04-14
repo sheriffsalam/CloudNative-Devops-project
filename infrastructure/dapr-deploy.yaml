@@ -1,0 +1,94 @@
+apiVersion: dapr.io/v1alpha1
+kind: Configuration
+metadata:
+  name: dapr-config
+  namespace: default
+spec:
+  httpPipeline:
+    handlers:
+    - name: opa-policy
+      type: middleware.http.opa
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-operator
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-operator
+  template:
+    metadata:
+      labels:
+        app: dapr-operator
+    spec:
+      containers:
+      - name: dapr-operator
+        image: daprio/dapr:latest
+        command: ["/dapr"]
+        args: ["operator"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-sentry
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-sentry
+  template:
+    metadata:
+      labels:
+        app: dapr-sentry
+    spec:
+      containers:
+      - name: dapr-sentry
+        image: daprio/dapr:latest
+        command: ["/dapr"]
+        args: ["sentry"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-placement
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-placement
+  template:
+    metadata:
+      labels:
+        app: dapr-placement
+    spec:
+      containers:
+      - name: dapr-placement
+        image: daprio/dapr:latest
+        command: ["/dapr"]
+        args: ["placement"]
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dapr-sidecar-injector
+  namespace: dapr-system
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dapr-sidecar-injector
+  template:
+    metadata:
+      labels:
+        app: dapr-sidecar-injector
+    spec:
+      containers:
+      - name: dapr-sidecar-injector
+        image: daprio/dapr:latest
+        command: ["/dapr"]
+        args: ["sidecar-injector"]
