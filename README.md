@@ -1,44 +1,25 @@
-# CloudNative DevOps Project
+# 🚀 Cloud Native DevOps Platform
+## Senior SRE/DevOps/DevSecOps Engineering System
 
-This project implements Tasks 1 and 2 for deploying microservices with various tools in Kubernetes.
+[![CI/CD Pipeline](https://img.shields.io/badge/CI%2FCD-GitHub%20Actions-blue)](https://github.com/sheriffsalam/CloudNative-Devops-project/actions)
+[![Security Scanning](https://img.shields.io/badge/Security-Trivy%20%2B%20Snyk-green)](./docs/SECURITY.md)
+[![Kubernetes](https://img.shields.io/badge/K8s-Production%20Ready-326ce5)](./k8s)
+[![IaC](https://img.shields.io/badge/IaC-Terraform-623ce4)](./infra/terraform)
 
-## Components
+---
 
-- **APISIX**: API Gateway and Load Balancer
-- **OPA (Open Policy Agent)**: Policy enforcement
-- **Dapr**: Service mesh for communication
-- **YugabyteDB**: Distributed SQL database
-- **Kafka**: Message broker
-- **KEDA**: Autoscaling
-- **Service-1 & Service-2**: Python FastAPI microservices
+## 📋 Executive Summary
 
-## Deployment Steps
+A **production-grade cloud platform** demonstrating enterprise-level reliability, security, and operational excellence:
 
-1. Deploy infrastructure components:
-   - kubectl apply -f infrastructure/
-   
-2. Deploy OPA:
-   - kubectl apply -f opa/
-   
-3. Deploy Dapr components:
-   - kubectl apply -f dapr/
-   
-4. Deploy services:
-   - kubectl apply -f service-1/
-   - kubectl apply -f service-2/
-   
-5. Deploy KEDA and autoscaling:
-   - kubectl apply -f keda/
-   - kubectl apply -f infrastructure/prometheus-deploy.yaml
+✅ **Infrastructure as Code** (Terraform multi-region AWS)  
+✅ **SRE Practices** (99.9% SLO, error budgets, runbooks)  
+✅ **DevSecOps** (Automated security scanning, policy enforcement)  
+✅ **Observability** (Prometheus, Grafana, AlertManager)  
+✅ **Kubernetes Best Practices** (High availability, autoscaling, security hardening)  
+✅ **CI/CD Automation** (GitHub Actions, GitOps deployments)  
 
-## Testing
+---
 
-### Manual Testing Methods
+## 🏗️ Architecture Overview
 
-1. **Port-forward service-1 to localhost:**
-   ```bash
-   kubectl port-forward svc/service-1 8000:8000
-   curl -X POST http://localhost:8000/order \
-       -H "Content-Type: application/json" \
-       -d '{"id": "order-123", "data": {"product": "item", "quantity": 5}}'
-Use helm/Chart.yaml for Helm deployment.
